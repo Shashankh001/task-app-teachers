@@ -1,0 +1,235 @@
+#:kivy 2.1.0
+
+
+
+WindowManager:
+    Login:
+        name: 'login'
+        id: 'login'
+    Menu:
+        name: 'menu'
+        id: menuu
+    Notice:
+        name: 'notice'
+        id: 'notice'
+    Homework:
+        name: 'homework'
+        id: 'homework'
+    LoadNotice:
+        name: 'loadnotice'
+        id: 'loadnotice'
+    LoadHomework:
+        name: 'loadhomework'
+        id: 'loadhomework'
+
+
+<Login>:
+    MDCard:
+        size_hint: None,None
+        size: 300,400
+        pos_hint: {'center_x':0.5,'center_y':0.5}
+        padding: 25
+        spacing: 15
+        orientation: 'vertical'
+
+        MDLabel:
+            text: "Login"
+            font_size: '22sp'
+            halign: 'center'
+            size_hint_y: None
+            height: self.texture_size[1]
+            padding_y: 25
+        
+        MDTextField:
+            text: 'Juliana'
+            id: username
+            hint_text: "Enter Username"
+            size_hint_x: None
+            width: 200
+            font_size: '18sp'
+            multiline: False
+            pos_hint: {'center_x':0.5}
+            helper_text: "Invalid Details"
+            helper_text_mode: "on_error"
+
+        MDTextField:
+            text: 'Juliana079'
+            id: password
+            hint_text: "Enter Password"
+            size_hint_x: None
+            width: 200
+            font_size: '18sp'
+            multiline: False
+            pos_hint: {'center_x':0.5}
+            helper_text: "Invalid Details"
+            helper_text_mode: "on_error"
+
+        Widget:
+            size_hint_y: None
+            height:10
+
+        MDRaisedButton:
+            id: login
+            text: "Login"
+            font_size: '18sp'
+            pos_hint: {'center_x':0.5}
+            on_release: root.login()
+
+        Widget:
+            size_hint_y: None
+            height:10
+
+
+
+<Menu>:
+    Label: 
+        text: 'Main Menu'
+        font_size: '28sp'
+        pos_hint: {'center_x': 0.5, 'center_y':0.7}
+
+    MDFillRoundFlatButton:
+        text: "Send a notice"
+        font_size: '18sp'
+        size_hint_x: .2
+        pos_hint: {'center_x': 0.5, 'center_y':0.4}
+        on_release: root.notice()
+
+    MDFillRoundFlatButton:
+        text: "Send Homework"
+        font_size: '18sp'
+        size_hint_x: .2
+        pos_hint: {'center_x': 0.5, 'center_y':0.5}
+        on_release: root.homework()
+
+    Label:
+        text: 'Version 1.0.0'
+        font_size: '16sp'
+        pos_hint: {'center_x': 0.5, 'center_y':0.02}
+
+
+<Notice>:
+    Label:
+        text: 'Send a Notice'
+        pos_hint: {'center_x':0.5,'center_y':0.9}
+        font_size: '28sp'
+
+    MDTextField:
+        id: textt
+        hint_text: "Click To Enter Text"
+        mode: "fill"
+        multiline: True
+        size_hint: 0.9,0.6
+        pos_hint: {'center_x':0.5,'center_y':0.5}
+    
+    MDRaisedButton:
+        id: files
+        text: "Attach files"
+        font_size: '18sp'
+        pos_hint: {'center_x':0.2, 'center_y':0.14}
+        on_release: root.thread_atfiles()
+
+    MDRaisedButton:
+        id: send
+        text: "Send Notice"
+        font_size: '18sp'
+        pos_hint: {'center_x':0.5, 'center_y':0.14}
+        on_release: root.thread_notice()
+
+    MDRaisedButton:
+        id: rem_attch
+        text: "Remove all attachments"
+        font_size: '18sp'
+        pos_hint: {'center_x':0.8, 'center_y':0.14}
+        on_release: root.remAttch()
+
+    MDRectangleFlatButton:
+        id: back
+        text: 'Back'
+        pos_hint: {'center_x':0.96, 'center_y':0.96}
+        on_release: root.back_to_menu()
+    
+    Label:
+        id: atth
+        text: 'Attachments uploaded: 0'
+        pos_hint: {'center_x':0.5, 'center_y':0.07}
+        font_size: '16sp'
+
+
+<Homework>:
+    Label:
+        text: 'Send Homework'
+        pos_hint: {'center_x':0.5,'center_y':0.9}
+        font_size: '28sp'
+
+    MDTextField:
+        id: textt
+        hint_text: "Click To Enter Text"
+        mode: "fill"
+        multiline: True
+        size_hint: 0.9,0.6
+        pos_hint: {'center_x':0.5,'center_y':0.5}
+    
+    MDRaisedButton:
+        id: files
+        text: "Attach files"
+        font_size: '18sp'
+        pos_hint: {'center_x':0.2, 'center_y':0.14}
+        on_release: root.thread_atfiles()
+
+    MDRaisedButton:
+        id: send
+        text: "Send Homework"
+        font_size: '18sp'
+        pos_hint: {'center_x':0.5, 'center_y':0.14}
+        on_release: root.thread_homework()
+
+    MDRaisedButton:
+        id: rem_attch
+        text: "Remove all attachments"
+        font_size: '18sp'
+        pos_hint: {'center_x':0.8, 'center_y':0.14}
+        on_release: root.remAttch()
+
+    MDRectangleFlatButton:
+        id: back
+        text: 'Back'
+        pos_hint: {'center_x':0.96, 'center_y':0.96}
+        on_release: root.back_to_menu()
+    
+    Label:
+        id: atth
+        text: 'Attachments uploaded: 0'
+        pos_hint: {'center_x':0.5, 'center_y':0.07}
+        font_size: '16sp'
+
+<LoadNotice>:
+    Label:
+        text: "Sending your Notice. Hang on tight!"
+        pos_hint: {'center_x':0.6,'center_y':0.5}
+        bold: True
+        font_size: 40
+
+    Label:
+        text: 'You will be redirected to the main menu after the homework is sent!'
+        font_size: 20
+        pos_hint: {'center_x':0.6,'center_y':0.44}
+    
+    MDSpinner:
+        size_hint: 0.1,0.1
+        pos_hint: {'center_x':0.2,'center_y':0.5}
+
+<LoadHomework>:
+    Label:
+        text: "Sending your Homework. Hang on tight!"
+        pos_hint: {'center_x':0.6,'center_y':0.5}
+        bold: True
+        font_size: 40
+    
+    Label:
+        text: 'You will be redirected to the main menu after the homework is sent!'
+        font_size: 20
+        pos_hint: {'center_x':0.6,'center_y':0.44}
+        
+    MDSpinner:
+        size_hint: 0.1,0.1
+        pos_hint: {'center_x':0.2,'center_y':0.5}    
