@@ -16,6 +16,9 @@ from kivymd.uix.dialog import MDDialog
 from kivy.clock import Clock
 from kivy.uix.image import Image
 import notif_sender
+from kivy.core.window import Window
+
+Window.size = (1080, 720)
 
 mega = Mega()
 mega._login_user('shashankhgedda@gmail.com','Shashankh*12@mydad')
@@ -509,8 +512,7 @@ class Homework(Screen):
 
         #sending attachments if any       
         attachments = len(self.attch)
-        print(self.attch)
-        print(attachments)
+
         links = []
         try:
             for i in range(0, attachments):
@@ -549,7 +551,7 @@ class WindowManager(ScreenManager):
 
 class TaskAppApp(MDApp):
     def __init__(self, **kwargs):
-        self.title = "Task App"
+        self.title = "Task App - Teachers"
         super().__init__(**kwargs)
 
     def build(self):
