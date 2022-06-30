@@ -21,7 +21,7 @@ from kivy.core.window import Window
 Window.size = (1080, 720)
 
 mega = Mega()
-mega._login_user('shashankhgedda@gmail.com','Shashankh*12@mydad')
+mega._login_user()
 
 
 IP  = '192.168.0.102'
