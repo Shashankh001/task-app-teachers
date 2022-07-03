@@ -1,9 +1,15 @@
 import socket
 import time
 
+def get_ip():
+    with open('ip.txt') as f:
+        return f.read()
+
+IP = get_ip()
+
 def send(arg, message): #usage: send("HW","The notification message")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('192.168.0.102',2231))
+    s.connect((IP,2231))
 
     s.send(bytes(arg,'utf-8'))
     

@@ -23,8 +23,11 @@ Window.size = (1080, 720)
 mega = Mega()
 mega._login_user()
 
+def get_ip():
+    with open('ip.txt') as f:
+        return f.read()
 
-IP  = '192.168.0.102'
+IP = get_ip()
 PORT = 2345
 details = []
 codes = ['LOGIN','SEND_NOTICE','SEND_HOMEWORK','SEND_ATTCH']
@@ -385,7 +388,7 @@ class Notice(Screen):
 
         #connecting
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('192.168.0.102',2345))
+        s.connect((IP,2345))
 
         s.send(bytes(codes[1],'utf-8'))
         
@@ -500,7 +503,7 @@ class Homework(Screen):
 
         #connecting
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('192.168.0.102',2345))
+        s.connect((IP,2345))
 
         s.send(bytes(codes[2],'utf-8'))
         
