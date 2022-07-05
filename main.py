@@ -21,7 +21,6 @@ from kivy.core.window import Window
 Window.size = (1080, 720)
 
 mega = Mega()
-mega._login_user()
 
 def get_ip():
     with open('ip.txt') as f:
