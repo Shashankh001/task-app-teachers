@@ -2,12 +2,12 @@ import socket
 import time
 
 def get_ip():
-    with open('ip.txt') as f:
+    with open('ip2.txt') as f:
         return f.read()
 
 IP = get_ip()
 
-def send(arg, message): #usage: send("HW","The notification message")
+def sendd(arg, message): #usage: send("HW","The notification message")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((IP,2231))
 

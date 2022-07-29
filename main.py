@@ -10,6 +10,7 @@ from datetime import date
 import socket
 from mega import Mega
 from kivymd.uix.card import MDCard
+from kivymd.uix.button import MDFlatButton
 from kivy.uix.label import Label
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.dialog import MDDialog
@@ -17,13 +18,17 @@ from kivy.clock import Clock
 from kivy.uix.image import Image
 import notif_sender
 from kivy.core.window import Window
+from kivy.metrics import dp, sp
+from kivy.uix.boxlayout import BoxLayout
+from kivymd.uix.pickers import MDDatePicker
 
 Window.size = (1080, 720)
 
 mega = Mega()
+mega._login_user('','')
 
 def get_ip():
-    with open('ip.txt') as f:
+    with open('ip2.txt') as f:
         return f.read()
 
 IP = get_ip()
@@ -31,7 +36,7 @@ PORT = 2345
 details = []
 codes = ['LOGIN','SEND_NOTICE','SEND_HOMEWORK','SEND_ATTCH']
 
-kv = """
+kv = '''
 #:kivy 2.1.0
 
 
@@ -60,7 +65,7 @@ WindowManager:
 <Login>:
     MDCard:
         size_hint: None,None
-        size: 300,400
+        size: ('300dp','400dp')
         pos_hint: {'center_x':0.5,'center_y':0.5}
         padding: 25
         spacing: 15
@@ -75,11 +80,11 @@ WindowManager:
             padding_y: 25
         
         MDTextField:
-            text: 'Juliana'
             id: username
+            text: 'Shashankh'
             hint_text: "Enter Username"
             size_hint_x: None
-            width: 200
+            width: '200dp'
             font_size: '18sp'
             multiline: False
             pos_hint: {'center_x':0.5}
@@ -87,11 +92,11 @@ WindowManager:
             helper_text_mode: "on_error"
 
         MDTextField:
-            text: 'Juliana079'
             id: password
+            text: 'HueHueHue'
             hint_text: "Enter Password"
             size_hint_x: None
-            width: 200
+            width: '200dp'
             font_size: '18sp'
             multiline: False
             pos_hint: {'center_x':0.5}
@@ -100,7 +105,7 @@ WindowManager:
 
         Widget:
             size_hint_y: None
-            height:10
+            height:'10dp'
 
         MDRaisedButton:
             id: login
@@ -111,30 +116,63 @@ WindowManager:
 
         Widget:
             size_hint_y: None
-            height:10
+            height:'10dp'
 
 
 
 <Menu>:
+    MDIconButton:
+        icon: 'exit-to-app'
+        pos_hint: {'center_x':0.95,'center_y':0.95}
+        on_release: root.log_out()
+
     Label: 
         text: 'Main Menu'
         font_size: '28sp'
-        pos_hint: {'center_x': 0.5, 'center_y':0.7}
+        pos_hint: {'center_x': 0.5, 'center_y':0.83}
 
-    MDFillRoundFlatButton:
-        text: "Send a notice"
-        font_size: '18sp'
-        size_hint_x: .2
-        pos_hint: {'center_x': 0.5, 'center_y':0.4}
+    MDCard:
+        size_hint: None,None
+        size: '265dp','150dp'
+        pos_hint: {'center_x': 0.5, 'center_y':0.6}
+        orientation: 'vertical'
+        line_color: 150/255,150/255,150/255,1
+        focus_behavior: True
+        ripple_behavior: True
         on_release: root.notice()
 
-    MDFillRoundFlatButton:
-        text: "Send Homework"
-        font_size: '18sp'
-        size_hint_x: .2
-        pos_hint: {'center_x': 0.5, 'center_y':0.5}
+        
+        Label:
+            text: 'Notices'
+            font_size: '18sp'
+
+        MDSeparator:
+
+        Label:
+            text: 'Click to sent notices'
+            font_size: '14sp'
+            color: 150/255,150/255,150/255,1
+
+    MDCard:
+        size_hint: None,None
+        size: '265dp','150dp'
+        pos_hint: {'center_x': 0.5, 'center_y':0.35}
+        orientation: 'vertical'
+        line_color: 150/255,150/255,150/255,1
+        focus_behavior: True
+        ripple_behavior: True
         on_release: root.homework()
 
+        Label:
+            text: 'Homework'
+            font_size: '18sp'
+
+        MDSeparator:
+
+        Label:
+            text: 'Click to send homework'
+            font_size: '14sp'
+            color: 150/255,150/255,150/255,1
     Label:
         text: 'Version 1.0.0'
         font_size: '16sp'
@@ -152,8 +190,8 @@ WindowManager:
         hint_text: "Click To Enter Text"
         mode: "fill"
         multiline: True
-        size_hint: 0.9,0.6
-        pos_hint: {'center_x':0.5,'center_y':0.5}
+        size_hint: ('0.9dp','0.6dp')
+        pos_hint: {'center_x':0.5,'center_y':0.55}
     
     MDRaisedButton:
         id: files
@@ -174,7 +212,7 @@ WindowManager:
         text: "Remove all attachments"
         font_size: '18sp'
         pos_hint: {'center_x':0.8, 'center_y':0.14}
-        on_release: root.remAttch()
+        on_release: root.remAttch('bean')
 
     MDRectangleFlatButton:
         id: back
@@ -200,7 +238,7 @@ WindowManager:
         hint_text: "Click To Enter Text"
         mode: "fill"
         multiline: True
-        size_hint: 0.9,0.6
+        size_hint: ('0.9dp','0.6dp')
         pos_hint: {'center_x':0.5,'center_y':0.5}
     
     MDRaisedButton:
@@ -222,7 +260,7 @@ WindowManager:
         text: "Remove all attachments"
         font_size: '18sp'
         pos_hint: {'center_x':0.8, 'center_y':0.14}
-        on_release: root.remAttch()
+        on_release: root.remAttch('bean')
 
     MDRectangleFlatButton:
         id: back
@@ -241,15 +279,15 @@ WindowManager:
         text: "Sending your Notice. Hang on tight!"
         pos_hint: {'center_x':0.6,'center_y':0.5}
         bold: True
-        font_size: 40
+        font_size: '40sp'
 
     Label:
         text: 'You will be redirected to the main menu after the homework is sent!'
-        font_size: 20
+        font_size: '20sp'
         pos_hint: {'center_x':0.6,'center_y':0.44}
     
     MDSpinner:
-        size_hint: 0.1,0.1
+        size_hint: ('0.1dp','0.1dp')
         pos_hint: {'center_x':0.2,'center_y':0.5}
 
 <LoadHomework>:
@@ -257,17 +295,17 @@ WindowManager:
         text: "Sending your Homework. Hang on tight!"
         pos_hint: {'center_x':0.6,'center_y':0.5}
         bold: True
-        font_size: 40
+        font_size: '40sp'
     
     Label:
         text: 'You will be redirected to the main menu after the homework is sent!'
-        font_size: 20
+        font_size: '20sp'
         pos_hint: {'center_x':0.6,'center_y':0.44}
         
     MDSpinner:
-        size_hint: 0.1,0.1
+        size_hint: ('0.1dp','0.1dp')
         pos_hint: {'center_x':0.2,'center_y':0.5}    
-"""
+'''
 
 class Login(Screen):
     def login(self):        
@@ -294,11 +332,18 @@ class Login(Screen):
             if user == username and passw == password:
                 self.ids.username.error = False
                 self.ids.password.error = False
+
                 s.send(bytes('SUCCESS','utf-8'))
+
                 details.append(username)
                 details.append(subject)
                 index = 1
+
+                self.ids.username.text = ''
+                self.ids.password.text = ''
                 TaskAppApp.build.kv.current = 'menu'
+                TaskAppApp.build.kv.transition.direction = 'left'
+
                 
 
         if index == None:
@@ -315,13 +360,19 @@ class Menu(Screen):
     
     def homework(self):
         TaskAppApp.build.kv.current = 'homework'
+        TaskAppApp.build.kv.transition.direction = 'left'
 
-
+    def log_out(self):
+        global details
+        details = []
+        TaskAppApp.build.kv.current = 'login'
+        TaskAppApp.build.kv.transition.direction = 'right'
 
 class Notice(Screen):   
     attch = []
 
     def back_to_menu(self):
+        self.ids.textt.text = ''
         TaskAppApp.build.kv.current = 'menu'
         TaskAppApp.build.kv.transition.direction = 'right'
 
@@ -360,22 +411,35 @@ class Notice(Screen):
         self.ids.textt.text = ''
         self.remove_widget(Notice.thread_notice.spinner)
 
-    def remAttch(self):
+    def remAttch(self, dt):
         self.attch = []
         self.ids.atth.text = f"Attachments uploaded: 0"
 
 
     def thread_notice(self):
-        t1 = Thread(target= Notice.sendNotice, args =(self,))
+        datepicker = MDDatePicker()
+        datepicker.open()
+
+        datepicker.bind(on_save=self.send_notice, on_cancel=self.send_notice_no_due)
+
+    
+    def send_notice(self, instance, value, date_range):
+        t1 = Thread(target= Notice.sendNotice, args =(self,str(value)))
         t1.daemon = True
         t1.start()
 
         TaskAppApp.build.kv.current = 'loadnotice'
         TaskAppApp.build.kv.transition.direction = 'left'
 
-        
+    def send_notice_no_due(self, *args):
+        t1 = Thread(target= Notice.sendNotice, args =(self,'No Due Date Specified'))
+        t1.daemon = True
+        t1.start()
 
-    def sendNotice(self):
+        TaskAppApp.build.kv.current = 'loadnotice'
+        TaskAppApp.build.kv.transition.direction = 'left'
+
+    def sendNotice(self, duedate):
         #gathering details
         text = self.ids.textt.text
         try:
@@ -413,7 +477,10 @@ class Notice(Screen):
         except FileNotFoundError:
             print('no file')
 
-        notice = {"Teacher":details[0],"Subject":details[1],"Time":time,"Date":datee,"Attachments":links,"Context":text}
+        if len(data) == 50:
+            del data[0]
+
+        notice = {"Teacher":details[0],"Subject":details[1],"Time":time,"Date":datee,"DueDate":duedate,"Attachments":links,"Context":text}
         data.append(notice)
 
         #sending the json file back
@@ -422,8 +489,10 @@ class Notice(Screen):
         s.send(bytes(jsonObj,'utf-8'))
 
         #finishing up
-        notif_sender.send('NOT',text)
+        #notif_sender.send('NOT',text)
+        Clock.schedule_once(self.remAttch, 1)
         Clock.schedule_once(self.back_to_menu_t, 1)
+        
 
             
 
@@ -441,6 +510,7 @@ class Homework(Screen):
         TaskAppApp.build.kv.transition.direction = 'right'
 
     def back_to_menu_t(self, dt):
+        self.ids.textt.text = ''
         TaskAppApp.build.kv.current = 'menu'
         TaskAppApp.build.kv.transition.direction = 'right'
 
@@ -475,22 +545,35 @@ class Homework(Screen):
         self.ids.textt.text = ''
         self.remove_widget(Homework.thread_notice.spinner)
 
-    def remAttch(self):
+    def remAttch(self, dt):
         self.attch = []
         self.ids.atth.text = f"Attachments uploaded: 0"
 
 
     def thread_homework(self):
-        t1 = Thread(target= Homework.sendHomework, args =(self,))
+        datepicker = MDDatePicker()
+        datepicker.open()
+
+        datepicker.bind(on_save=self.send_homework, on_cancel=self.send_homework_no_due)
+
+    
+    def send_homework(self, instance, value, date_range):
+        t1 = Thread(target= Homework.sendHomework, args =(self,str(value)))
         t1.daemon = True
         t1.start()
 
         TaskAppApp.build.kv.current = 'loadhomework'
         TaskAppApp.build.kv.transition.direction = 'left'
 
-        
+    def send_homework_no_due(self, *args):
+        t1 = Thread(target= Homework.sendHomework, args =(self,'No Due Date Specified'))
+        t1.daemon = True
+        t1.start()
 
-    def sendHomework(self):
+        TaskAppApp.build.kv.current = 'loadhomework'
+        TaskAppApp.build.kv.transition.direction = 'left'
+
+    def sendHomework(self, duedate):
         #gathering details
         text = self.ids.textt.text
         try:
@@ -528,8 +611,11 @@ class Homework(Screen):
         except FileNotFoundError:
             print('no file')
 
-        notice = {"Teacher":details[0],"Subject":details[1],"Time":time,"Date":datee,"Attachments":links,"Context":text}
-        data.append(notice)
+        if len(data) == 50:
+            del data[0]
+
+        homework = {"Teacher":details[0],"Subject":details[1],"Time":time,"Date":datee,"DueDate":duedate,"Attachments":links,"Context":text}
+        data.append(homework)
 
         #sending the json file back
         jsonObj = json.dumps(data)
@@ -537,7 +623,8 @@ class Homework(Screen):
         s.send(bytes(jsonObj,'utf-8'))
 
         #finishing up
-        notif_sender.send('HW',text)
+        #notif_sender.send('HW',text)
+        Clock.schedule_once(self.remAttch, 1)
         Clock.schedule_once(self.back_to_menu_t, 1)
 
 
