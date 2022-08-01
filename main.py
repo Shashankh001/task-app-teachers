@@ -21,6 +21,12 @@ from kivy.core.window import Window
 from kivy.metrics import dp, sp
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.pickers import MDDatePicker
+from kivy.uix.scrollview import ScrollView
+from kivy.effects.scroll import ScrollEffect
+from kivy.uix.stacklayout import StackLayout
+from functools import *
+import sys
+import time
 
 Window.size = (1080, 720)
 
@@ -35,6 +41,31 @@ IP = get_ip()
 PORT = 2345
 details = []
 codes = ['LOGIN','SEND_NOTICE','SEND_HOMEWORK','SEND_ATTCH']
+CLASS = None
+
+def get_bytesize_string(string, bytelen):
+    string_length = sys.getsizeof(string)
+
+    if string_length == bytelen: return None
+    
+    if string_length < bytelen:
+        difference = bytelen - string_length
+        for i in range(0, difference):
+            string += ' '
+
+        return string
+
+def get_bytesize_bytes(byte, bytelen):
+    byte_length = sys.getsizeof(byte)
+
+    if byte_length == bytelen: return None
+    
+    if byte_length < bytelen:
+        difference = bytelen - byte_length
+        for i in range(0, difference):
+            byte += b' '
+
+        return byte
 
 kv = '''
 #:kivy 2.1.0
@@ -48,6 +79,12 @@ WindowManager:
     Menu:
         name: 'menu'
         id: menuu
+    SelectClassNotice:
+        name: 'select-class-notice'
+        id: 'select-class-notice'
+    SelectClassHomework:
+        name: 'select-class-homework'
+        id: 'select-class-homework'
     Notice:
         name: 'notice'
         id: 'notice'
@@ -60,6 +97,7 @@ WindowManager:
     LoadHomework:
         name: 'loadhomework'
         id: 'loadhomework'
+
 
 
 <Login>:
@@ -178,6 +216,29 @@ WindowManager:
         font_size: '16sp'
         pos_hint: {'center_x': 0.5, 'center_y':0.02}
 
+<SelectClassNotice>:
+    Label:
+        text: 'Select a Class'
+        pos_hint: {'center_x':0.5,'center_y':0.9}
+        font_size: '28sp'
+
+    MDRectangleFlatButton:
+        id: back
+        text: 'Back'
+        pos_hint: {'center_x':0.96, 'center_y':0.96}
+        on_release: root.back_to_menu()
+
+<SelectClassHomework>:
+    Label:
+        text: 'Select a Class'
+        pos_hint: {'center_x':0.5,'center_y':0.9}
+        font_size: '28sp'
+
+    MDRectangleFlatButton:
+        id: back
+        text: 'Back'
+        pos_hint: {'center_x':0.96, 'center_y':0.96}
+        on_release: root.back_to_menu()
 
 <Notice>:
     Label:
@@ -355,11 +416,11 @@ class Login(Screen):
 
 class Menu(Screen):
     def notice(self):
-        TaskAppApp.build.kv.current = 'notice'
+        TaskAppApp.build.kv.current = 'select-class-notice'
         TaskAppApp.build.kv.transition.direction = 'left'
     
     def homework(self):
-        TaskAppApp.build.kv.current = 'homework'
+        TaskAppApp.build.kv.current = 'select-class-homework'
         TaskAppApp.build.kv.transition.direction = 'left'
 
     def log_out(self):
@@ -368,15 +429,149 @@ class Menu(Screen):
         TaskAppApp.build.kv.current = 'login'
         TaskAppApp.build.kv.transition.direction = 'right'
 
-class Notice(Screen):   
+class SelectClassNotice(Screen):
+    layout = StackLayout(size_hint=(1, None),orientation='rl-bt', spacing=20)
+    layout.bind(minimum_height=layout.setter('height'))
+
+    root = ScrollView(size_hint=(1, 0.8), effect_cls=ScrollEffect)
+    root.add_widget(layout)
+
+    class_list = ['1-A', '1-B', '1-C', '1-D', '2-A', '2-B', '2-C', '2-D', '3-A', '3-B', '3-C', '3-D', '4-A', '4-B', '4-C', '4-D', '5-A', '5-B', '5-C', '5-D', '6-A', '6-B', '6-C', '6-D', '7-A', '7-B', '7-C', '7-D', '8-A', '8-B', '8-C', '8-D', '9-A', '9-B', '9-C', '9-D', '10-A', '10-B', '10-C', '10-D']
+    
+    def on_enter(self, *args):
+        self.load_classes()
+        return super().on_enter(*args)
+
+    def back_to_menu(self):
+        for child in [child for child in self.layout.children]:
+            self.layout.remove_widget(child)
+
+        TaskAppApp.build.kv.current = 'menu'
+        TaskAppApp.build.kv.transition.direction = 'right'
+
+    def load_classes(self):
+        for i in range(0, len(self.class_list)):
+            class_name = Label(text=self.class_list[i],
+                        markup= True,
+                        padding= [15,15],
+                        size_hint=(1,None),
+                        halign="left",
+                        valign="middle")
+            
+            class_name.bind(size=class_name.setter('text_size')) 
+            class_name._label.refresh()
+            class_name.height= (class_name._label.texture.size[1] + 2*class_name.padding[1])
+
+            card = MDCard(
+                height=class_name.height,
+                style = 'elevated',
+                size_hint= (1,None),
+                orientation = 'vertical',
+                ripple_behavior = True
+            )
+
+            card.bind(on_release = partial(self.select_user, self.class_list[i]))
+
+            self.layout.add_widget(card)
+            card.add_widget(class_name)
+            
+        try:
+            self.add_widget(self.root)
+        except:
+            print("[ERROR] Couldn't add root widget, reason: root widget already exists.")
+
+
+    def select_user(self, class_name, inst):
+        print(class_name)
+        for child in [child for child in self.layout.children]:
+            self.layout.remove_widget(child)
+
+        global CLASS
+        CLASS = class_name
+
+        TaskAppApp.build.kv.current = 'notice'
+        TaskAppApp.build.kv.transition.direction = 'left'
+
+class SelectClassHomework(Screen):
+    layout = StackLayout(size_hint=(1, None),orientation='rl-bt', spacing=20)
+    layout.bind(minimum_height=layout.setter('height'))
+
+    root = ScrollView(size_hint=(1, 0.8), effect_cls=ScrollEffect)
+    root.add_widget(layout)
+
+    class_list = ['1-A', '1-B', '1-C', '1-D', '2-A', '2-B', '2-C', '2-D', '3-A', '3-B', '3-C', '3-D', '4-A', '4-B', '4-C', '4-D', '5-A', '5-B', '5-C', '5-D', '6-A', '6-B', '6-C', '6-D', '7-A', '7-B', '7-C', '7-D', '8-A', '8-B', '8-C', '8-D', '9-A', '9-B', '9-C', '9-D', '10-A', '10-B', '10-C', '10-D']
+    
+    def back_to_menu(self):
+        for child in [child for child in self.layout.children]:
+            self.layout.remove_widget(child)
+            
+        TaskAppApp.build.kv.current = 'menu'
+        TaskAppApp.build.kv.transition.direction = 'right'
+
+    def on_enter(self, *args):
+        self.load_classes()
+        return super().on_enter(*args)
+
+    def load_classes(self):
+        for i in range(0, len(self.class_list)):
+            class_name = Label(text=self.class_list[i],
+                        markup= True,
+                        padding= [15,15],
+                        size_hint=(1,None),
+                        halign="left",
+                        valign="middle")
+            
+            class_name.bind(size=class_name.setter('text_size')) 
+            class_name._label.refresh()
+            class_name.height= (class_name._label.texture.size[1] + 2*class_name.padding[1])
+
+            card = MDCard(
+                height=class_name.height,
+                style = 'elevated',
+                size_hint= (1,None),
+                orientation = 'vertical',
+                ripple_behavior = True
+            )
+
+            card.bind(on_release = partial(self.select_user, self.class_list[i]))
+
+            self.layout.add_widget(card)
+            card.add_widget(class_name)
+            
+        try:
+            self.add_widget(self.root)
+        except:
+            print("[ERROR] Couldn't add root widget, reason: root widget already exists.")
+
+
+    def select_user(self, class_name, inst):
+        print(class_name)
+        for child in [child for child in self.layout.children]:
+            self.layout.remove_widget(child)
+
+        global CLASS
+        CLASS = class_name
+
+        TaskAppApp.build.kv.current = 'homework'
+        TaskAppApp.build.kv.transition.direction = 'left'
+
+
+
+class Notice(Screen):
     attch = []
 
     def back_to_menu(self):
+        global CLASS
+        CLASS = None
+
         self.ids.textt.text = ''
         TaskAppApp.build.kv.current = 'menu'
         TaskAppApp.build.kv.transition.direction = 'right'
 
     def back_to_menu_t(self, dt):
+        global CLASS
+        CLASS = None
+
         TaskAppApp.build.kv.current = 'menu'
         TaskAppApp.build.kv.transition.direction = 'right'
 
@@ -446,14 +641,21 @@ class Notice(Screen):
             images = Notice.attFiles.path
         except AttributeError:
             images = 'None'
-        time = datetime.today().strftime("%I:%M %p")
+        timee = datetime.today().strftime("%I:%M %p")
         datee = str(date.today())
 
         #connecting
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((IP,2345))
 
-        s.send(bytes(codes[1],'utf-8'))
+        CODE = get_bytesize_string(codes[1],1024)
+        s.send(bytes(CODE,'utf-8'))
+        time.sleep(0.03)
+        
+        global CLASS
+
+        CLASSS = get_bytesize_string(CLASS,1024)
+        s.send(bytes(CLASSS,'utf-8'))
         
         #recieving current data
         data = s.recv(10000000)
@@ -480,7 +682,7 @@ class Notice(Screen):
         if len(data) == 50:
             del data[0]
 
-        notice = {"Teacher":details[0],"Subject":details[1],"Time":time,"Date":datee,"DueDate":duedate,"Attachments":links,"Context":text}
+        notice = {"Teacher":details[0],"Subject":details[1],"Time":timee,"Date":datee,"DueDate":duedate,"Attachments":links,"Context":text}
         data.append(notice)
 
         #sending the json file back
@@ -492,6 +694,8 @@ class Notice(Screen):
         #notif_sender.send('NOT',text)
         Clock.schedule_once(self.remAttch, 1)
         Clock.schedule_once(self.back_to_menu_t, 1)
+
+        CLASS = None
         
 
             
@@ -506,10 +710,16 @@ class Homework(Screen):
     attch = []
 
     def back_to_menu(self):
+        global CLASS
+        CLASS = None
+
         TaskAppApp.build.kv.current = 'menu'
         TaskAppApp.build.kv.transition.direction = 'right'
 
     def back_to_menu_t(self, dt):
+        global CLASS
+        CLASS = None
+
         self.ids.textt.text = ''
         TaskAppApp.build.kv.current = 'menu'
         TaskAppApp.build.kv.transition.direction = 'right'
@@ -580,14 +790,21 @@ class Homework(Screen):
             images = Homework.attFiles.path
         except AttributeError:
             images = 'None'
-        time = datetime.today().strftime("%I:%M %p")
+        timee = datetime.today().strftime("%I:%M %p")
         datee = str(date.today())
 
         #connecting
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((IP,2345))
 
-        s.send(bytes(codes[2],'utf-8'))
+        CODE = get_bytesize_string(codes[2],1024)
+        s.send(bytes(CODE,'utf-8'))
+        time.sleep(0.03)
+        
+        global CLASS
+
+        CLASSS = get_bytesize_string(CLASS,1024)
+        s.send(bytes(CLASSS,'utf-8'))
         
         #recieving current data
         data = s.recv(10000000)
@@ -614,7 +831,7 @@ class Homework(Screen):
         if len(data) == 50:
             del data[0]
 
-        homework = {"Teacher":details[0],"Subject":details[1],"Time":time,"Date":datee,"DueDate":duedate,"Attachments":links,"Context":text}
+        homework = {"Teacher":details[0],"Subject":details[1],"Time":timee,"Date":datee,"DueDate":duedate,"Attachments":links,"Context":text}
         data.append(homework)
 
         #sending the json file back
@@ -626,7 +843,7 @@ class Homework(Screen):
         #notif_sender.send('HW',text)
         Clock.schedule_once(self.remAttch, 1)
         Clock.schedule_once(self.back_to_menu_t, 1)
-
+        CLASS = None
 
 
 
