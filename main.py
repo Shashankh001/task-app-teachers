@@ -1,4 +1,6 @@
-from kivy.app import App
+import os
+os.environ['KIVY_IMAGE'] = 'pil'
+import kivy
 from kivy.lang import Builder
 from kivy.uix.screenmanager import *
 from kivymd.app import MDApp
@@ -10,16 +12,9 @@ from datetime import date
 import socket
 from mega import Mega
 from kivymd.uix.card import MDCard
-from kivymd.uix.button import MDFlatButton
 from kivy.uix.label import Label
-from kivymd.uix.spinner import MDSpinner
-from kivymd.uix.dialog import MDDialog
 from kivy.clock import Clock
-from kivy.uix.image import Image
-import notif_sender
 from kivy.core.window import Window
-from kivy.metrics import dp, sp
-from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.pickers import MDDatePicker
 from kivy.uix.scrollview import ScrollView
 from kivy.effects.scroll import ScrollEffect
@@ -31,10 +26,10 @@ import time
 Window.size = (1080, 720)
 
 mega = Mega()
-mega._login_user('','')
+mega._login_user('shashankhgedda@gmail.com','MEGA12345@54321')
 
 def get_ip():
-    with open('ip2.txt') as f:
+    with open('ip.txt') as f:
         return f.read()
 
 IP = get_ip()
@@ -119,7 +114,7 @@ WindowManager:
         
         MDTextField:
             id: username
-            text: 'Shashankh'
+            text: ''
             hint_text: "Enter Username"
             size_hint_x: None
             width: '200dp'
@@ -131,7 +126,7 @@ WindowManager:
 
         MDTextField:
             id: password
-            text: 'HueHueHue'
+            text: ''
             hint_text: "Enter Password"
             size_hint_x: None
             width: '200dp'
@@ -187,7 +182,7 @@ WindowManager:
         MDSeparator:
 
         Label:
-            text: 'Click to sent notices'
+            text: 'Click to send notices'
             font_size: '14sp'
             color: 150/255,150/255,150/255,1
 
@@ -866,6 +861,14 @@ class TaskAppApp(MDApp):
         self.theme_cls.primary_palette = "Gray"
         return TaskAppApp.build.kv
 
+def resourcePath():
+    '''Returns path containing content - either locally or in pyinstaller tmp file'''
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS)
+
+    return os.path.join(os.path.abspath("."))
+
 
 if __name__ == '__main__':
+    kivy.resources.resource_add_path(resourcePath())
     TaskAppApp().run()
